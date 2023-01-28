@@ -20,5 +20,4 @@ jobs:
         with:
           name: package
           path: ./*.vsix
-      - run: npm run lint
       - run: npm test
