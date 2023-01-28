@@ -1,0 +1,43 @@
+name: Publish
+
+on:
+  push:
+    tags: 'v*'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'npm'
+      - name: Pack
+        run: npx @vscode/vsce package
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: package
+          path: ./*.vsix
+
+  publish:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: package
+      - id: read-package-json
+        name: Read package.json
+        run: |
+          echo package-name=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .name` >> $GITHUB_OUTPUT
+          echo version=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .version` >> $GITHUB_OUTPUT
+      - run: |
+          echo ${{ steps.read-package-json.outputs.package-name }}@${{ steps.read-package-json.outputs.version }}
+      # - name: Publish
+      #   env:
+      #     VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      #   run: npx @vscode/vsce publish --packagePath `ls ./*.vsix`
