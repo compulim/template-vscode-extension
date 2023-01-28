@@ -5,6 +5,6 @@ jobs:
   set-up:
     runs-on: ubuntu-latest
     steps:
-      # - run: npx --package=yo --package=generator-code -- yo code
-      - run: docker run -v $(pwd):/usr/src/app vscode-generator-code . -t=ts -q
+      - run: npx --package=yo --package=generator-code -- yo code . -t=ts -q
+      # - run: docker run -v $(pwd):/usr/src/app vscode-generator-code . -t=ts -q
       - run: ls -la
