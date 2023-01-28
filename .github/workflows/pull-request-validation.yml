@@ -1,0 +1,24 @@
+name: Pull request validation
+
+on:
+  pull:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'npm'
+      - run: npm clean-install
+      - run: npx @vscode/vsce package
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: package
+          path: ./*.vsix
+      - run: npm run lint
+      - run: npm test
