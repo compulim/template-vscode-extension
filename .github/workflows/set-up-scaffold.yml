@@ -23,7 +23,7 @@ jobs:
           npm install
       - name: Commit and push
         run: |
-          rm ./github/workflows/set-up-scaffold.yml
+          rm ./.github/workflows/set-up-scaffold.yml
           git add --all
           git commit --message "Initial 'template-vscode-extension' scaffold"
           git push --set-upstream origin ${{ github.event.inputs.target-branch }}
