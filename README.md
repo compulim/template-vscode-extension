@@ -26,7 +26,7 @@ You can follow our steps:
    - Your current version is `0.0.1-0` (pre-release of `0.0.1`)
    - You want to release `0.0.1`
 - Steps to release
-   - `git log` and make sure you are on the commit you want to publish as `0.0.1`, checks `package.json` for version
+   - `git log` and make sure you are on the commit you want to publish as `0.0.1`
    - `npm version 0.0.1`
    - `git push -u origin v0.0.1`, this will trigger publish
 - Post-release steps
