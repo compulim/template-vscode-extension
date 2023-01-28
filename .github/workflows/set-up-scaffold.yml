@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'npm'
       - name: Configure user profile
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
@@ -21,8 +25,7 @@ jobs:
         run: npx --package=yo --package=generator-code -- yo code . -t=ts -q
       - name: Update package.json
         run: |
-          cat package.json | jq '.name = "@${{ github.repository }}"' | jq '.repository.type = "git"' | jq '.repository.url = "${{ github.repositoryUrl }}"' | jq '.homepage = "https://github.com/${{ github.repository }}#readme"' > package-temp.json && mv package-temp.json package.json
-          npm install
+          cat package.json | jq '.repository.type = "git"' | jq '.repository.url = "${{ github.repositoryUrl }}"' | jq '.homepage = "https://github.com/${{ github.repository }}#readme"' > package-temp.json && mv package-temp.json package.json
       - name: Commit and push
         run: |
           rm ./.github/workflows/set-up-scaffold.yml
