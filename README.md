@@ -30,12 +30,12 @@ You can follow our steps:
    - `npm version 0.0.1`
    - `git push -u origin v0.0.1`, this will trigger publish
 - Post-release steps
-   - Immediately after publish, bump to `0.0.2-0` by creating a pull request
-   - `git checkout -b bump-0.0.2-0`
+   - It is highly recommended to bump to `0.0.2-0` immediately after `0.0.1` is published
+   - `git checkout -b bump-0.0.2-0` to create a new branch for pull request
    - `npm version --no-git-tag-version prepatch`, this will bump to `0.0.2-0`
    - `git commit -a -m "0.0.2-0"`
    - `git push -u origin bump-0.0.2-0`
-   - `gh pr create`
+   - `gh pr create`, to create a pull request
 
 ## Contributions
 
