@@ -20,15 +20,18 @@ jobs:
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
           git config user.name "${{ format('@{0}', github.actor) }}"
+      - name: Clean up
+        run: rm README.md
       - name: Run Yeoman
         run: npx --package=yo --package=generator-code -- yo code . -t=ts -q
       - name: Update package.json
         run: |
           npm version --no-git-tag-version 0.0.0-0
-          cat package.json | jq '.repository.type = "git"' | jq '.repository.url = "${{ github.repositoryUrl }}"' | jq '.homepage = "https://github.com/${{ github.repository }}#readme"' > package-temp.json && mv package-temp.json package.json
+          cat package.json | jq '.publisher = "${{ github.repository_owner }}"' | jq '.repository.type = "git"' | jq '.repository.url = "${{ github.repositoryUrl }}"' | jq '.homepage = "https://github.com/${{ github.repository }}#readme"' > package-temp.json && mv package-temp.json package.json
       - name: Commit and push
         run: |
           rm ./.github/workflows/set-up-scaffold.yml
+          rm ./LICENSE
           git add --all
           git commit --message "Initial 'template-vscode-extension' scaffold"
           git push --set-upstream origin ${{ github.event.inputs.target-branch }}

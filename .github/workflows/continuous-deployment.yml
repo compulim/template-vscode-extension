@@ -17,33 +17,37 @@ jobs:
       - name: Set version
         run: npx version-from-git --no-git-tag-version
       - run: npm install
-      - run: npx @vscode/vsce package
+      - run: npx @vscode/vsce package --pre-release
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: package
           path: ./*.vsix
-  publish-package:
-    if: ${{ github.run_number > 1 && github.repository != 'compulim/template-vscode-extension' }}
-    environment: prerelease
-    needs:
-      - build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: package
-      - id: read-package-json
-        name: Read package.json
-        run: |
-          echo package-name=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .name` >> $GITHUB_OUTPUT
-          echo version=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .version` >> $GITHUB_OUTPUT
-      - if: ${{ contains(steps.read-package-json.outputs.version, '-') }}
-        name: Check version number
-        run: |
-          echo ::error::Cannot publish production version ${{ steps.read-package-json.outputs.version }}
-          exit 1
-      - env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        name: Publish
-        run: npx @vscode/vsce publish --packagePath `ls ./*.vsix` --pre-release
+
+  # Currently, Visual Studio Marketplace is working on support semver prerelease.
+  # Until then, this workflow should be disabled.
+
+  # publish-package:
+  #   if: ${{ github.run_number > 1 && github.repository != 'compulim/template-vscode-extension' }}
+  #   environment: prerelease
+  #   needs:
+  #     - build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: package
+  #     - id: read-package-json
+  #       name: Read package.json
+  #       run: |
+  #         echo package-name=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .name` >> $GITHUB_OUTPUT
+  #         echo version=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .version` >> $GITHUB_OUTPUT
+  #     - if: ${{ !contains(steps.read-package-json.outputs.version, '-') }}
+  #       name: Check version number
+  #       run: |
+  #         echo ::error::Cannot publish production version ${{ steps.read-package-json.outputs.version }}
+  #         exit 1
+  #     - env:
+  #         VSCE_PAT: ${{ secrets.VSCE_PAT }}
+  #       name: Publish
+  #       run: npx @vscode/vsce publish --packagePath `ls ./*.vsix` --pre-release
