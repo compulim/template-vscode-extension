@@ -24,6 +24,7 @@ jobs:
         run: npx --package=yo --package=generator-code -- yo code . -t=ts -q
       - name: Update package.json
         run: |
+          npm version --no-git-tag-version 0.0.0-0
           cat package.json | jq '.repository.type = "git"' | jq '.repository.url = "${{ github.repositoryUrl }}"' | jq '.homepage = "https://github.com/${{ github.repository }}#readme"' > package-temp.json && mv package-temp.json package.json
       - name: Commit and push
         run: |
