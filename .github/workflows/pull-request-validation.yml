@@ -20,4 +20,10 @@ jobs:
         with:
           name: package
           path: ./*.vsix
-      - run: npm test
+      - run: npm run lint
+      
+      # Currently, running tests requires installation of VSCode.
+      # However, since GitHub runner is headless. Thus, tests could not run.
+      # We should uncomment when VSCode support running in headless mode.
+      
+      # - run: npm test
