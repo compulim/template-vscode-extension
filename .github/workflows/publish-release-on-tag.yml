@@ -7,6 +7,8 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -14,6 +16,14 @@ jobs:
         with:
           node-version: 18.x
           cache: 'npm'
+      - id: read-package-json
+        name: Read package.json
+        run: echo version=`cat package.json | jq -r .version` >> $GITHUB_OUTPUT
+      - if: ${{ github.ref_name != format('v{0}', steps.read-package-json.outputs.version) }}
+        name: Check version number
+        run: |
+          echo Tag (${{ github.ref_name }}) must be same as the package.json/version (v${{ steps.read-package-json.outputs.version }}).
+          exit 1
       - run: npm install
       - run: npx @vscode/vsce package
       - name: Upload artifact
@@ -37,7 +47,8 @@ jobs:
       - id: read-package-json
         name: Read package.json
         run: |
-          echo package-name=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .name` >> $GITHUB_OUTPUT
+          echo name=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .name` >> $GITHUB_OUTPUT
+          echo publisher=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .publisher` >> $GITHUB_OUTPUT
           echo version=`busybox unzip \`ls ./*.vsix\` -p extension/package.json | jq -r .version` >> $GITHUB_OUTPUT
       - if: ${{ contains(steps.read-package-json.outputs.version, '-') }}
         name: Check version number
@@ -48,10 +59,14 @@ jobs:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         name: Publish
         run: npx @vscode/vsce publish --packagePath `ls ./*.vsix`
+      - name: Summarize job
+        run: echo Visual Studio Code extension published to https://marketplace.visualstudio.com/items?itemName=${{ steps.read-package-json.outputs.publisher }}.${{ steps.read-package-json.outputs.name }}. >> $GITHUB_STEP_SUMMARY
   publish-release:
     needs:
       - build
       - publish-package
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Publish release
@@ -59,4 +74,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Summarize job
-        run: GitHub release created at https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}. >> $GITHUB_STEP_SUMMARY
+        run: echo GitHub release created at https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}. >> $GITHUB_STEP_SUMMARY
