@@ -1,6 +1,6 @@
 # template-vscode-extension
 
-Template for creating Visual Studio Code extension.
+Template for creating Visual Studio Code extension with preconfigured GitHub workflows.
 
 ## How to set up your new repository
 
