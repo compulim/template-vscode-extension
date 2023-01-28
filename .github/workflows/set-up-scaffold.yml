@@ -17,8 +17,10 @@ jobs:
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
           git config user.name "${{ format('@{0}', github.actor) }}"
-      - run: npx --package=yo --package=generator-code -- yo code . -t=ts -q
-      - run: |
+      - name: Run Yeoman
+        run: npx --package=yo --package=generator-code -- yo code . -t=ts -q
+      - name: Update package.json
+        run: |
           cat package.json | jq '.name = "@${{ github.repository }}"' | jq '.repository.type = "git"' | jq '.repository.url = "${{ github.repositoryUrl }}"' | jq '.homepage = "https://github.com/${{ github.repository }}#readme"' > package-temp.json && mv package-temp.json package.json
           npm install
       - name: Commit and push
