@@ -1,0 +1,15 @@
+on:
+  push:
+    tags: 'v*'
+  workflow_dispatch: {}
+
+jobs:
+  package:
+    steps:
+      - name: Pack
+        run: npx @vscode/vsce package
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: package
+          path: ./*.vsix

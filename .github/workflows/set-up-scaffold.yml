@@ -1,10 +1,29 @@
+name: Set up scaffold
+
 on:
-  workflow_dispatch: {}
+  push:
+    branches: ['main']
 
 jobs:
   set-up:
+    if: ${{ github.run_number == 1 && github.repository != 'compulim/template-vscode-extension' }}
+    permissions:
+      actions: write
+      contents: write
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - name: Configure user profile
+        run: |
+          git config user.email "${{ format('@{0}', github.actor) }}"
+          git config user.name "${{ format('@{0}', github.actor) }}"
       - run: npx --package=yo --package=generator-code -- yo code . -t=ts -q
-      # - run: docker run -v $(pwd):/usr/src/app vscode-generator-code . -t=ts -q
-      - run: ls -la
+      - run: |
+          cat package.json | jq '.name = "@${{ github.repository }}"' | jq '.repository.type = "git"' | jq '.repository.url = "${{ github.repositoryUrl }}"' | jq '.homepage = "https://github.com/${{ github.repository }}#readme"' > package-temp.json && mv package-temp.json package.json
+          npm install
+      - name: Commit and push
+        run: |
+          rm ./github/workflows/set-up-scaffold.yml
+          git add --all
+          git commit --message "Initial 'template-vscode-extension' scaffold"
+          git push --set-upstream origin ${{ github.event.inputs.target-branch }}
