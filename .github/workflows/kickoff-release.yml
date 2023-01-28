@@ -33,7 +33,7 @@ jobs:
         run: |
           npm version --no-git-tag-version ${{ inputs.version }}
           echo version=`cat package.json | jq -r .version` >> $GITHUB_OUTPUT
-      - name: Commit and tag as ${{ steps.bump-version.outputs.version }}
+      - name: Commit and tag as v${{ steps.bump-version.outputs.version }}
         run: |
           git add --all
           git commit --message ${{ steps.bump-version.outputs.version }}
@@ -49,3 +49,6 @@ jobs:
           git add --all
           git commit --message `cat package.json | jq -r .version`
           git push -u origin main
+      - name: Summarize job
+        run:
+          echo Tag [v${{ steps.bump-version.outputs.version }}](https://github.com/${{ github.repository }}/tree/v${{ steps.bump-version.outputs.version }} created. >> $GITHUB_STEP_SUMMARY
