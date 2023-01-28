@@ -18,8 +18,24 @@ Template for creating Visual Studio Code extension.
 
 ## How to publish
 
-1. Tag your commit with semver and prefix it with letter `v`, such as `v0.0.1`
-1. Push the tag to GitHub
+To publish, you need to push a tag that is corresponding to the version you want to publish. If you want to publish `0.0.1`, push a tag `v0.0.1` to your repository.
+
+You can follow our steps:
+
+- Assumptions
+   - Your current version is `0.0.1-0` (pre-release of `0.0.1`)
+   - You want to release `0.0.1`
+- Steps to release
+   - `git log` and make sure you are on the commit you want to publish as `0.0.1`, checks `package.json` for version
+   - `npm version 0.0.1`
+   - `git push -u origin v0.0.1`, this will trigger publish
+- Post-release steps
+   - Immediately after publish, bump to `0.0.2-0` by creating a pull request
+   - `git checkout -b bump-0.0.2-0`
+   - `npm version --no-git-tag-version prepatch`, this will bump to `0.0.2-0`
+   - `git commit -a -m "0.0.2-0"`
+   - `git push -u origin bump-0.0.2-0`
+   - `gh pr create`
 
 ## Contributions
 
