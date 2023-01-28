@@ -14,8 +14,8 @@ jobs:
         with:
           node-version: 18.x
           cache: 'npm'
-      - name: Pack
-        run: npx @vscode/vsce package
+      - run: npm install
+      - run: npx @vscode/vsce package
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
